@@ -25,5 +25,6 @@ def axpy(
         c = torch.empty_like(a)
 
     c = a + b * alpha
+
     return c
     

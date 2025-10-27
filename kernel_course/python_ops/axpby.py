@@ -27,5 +27,6 @@ def axpby(
         c = torch.empty_like(a)
 
     c = a * alpha + b * beta
+
     return c
     
