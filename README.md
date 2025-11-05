@@ -6,7 +6,7 @@ Learn how to develop high-performance kernels with [PyTorch](https://github.com/
 
 ## Basic Linear Algebra Subprograms
 
-The following BLAS kernels have been implemented in multiple frameworks. For each kernel, a ✅ indicates that the implementation is complete and verified to be numerically equivalent to the Python reference. A ❌ indicates that the implementation is pending. For more details on each kernel, please **click the name or icon**.
+The following BLAS kernels have been implemented in multiple frameworks. For each kernel, a ✅ indicates that the implementation is complete and verified to be numerically equivalent to the Python reference, a ❌ indicates that the implementation is pending. For more details on each kernel, please **click the name or icon**.
 
 
 | Name | Description | Equation | Flops | Data | Python | PyTorch | Triton | CuTe | Test |
