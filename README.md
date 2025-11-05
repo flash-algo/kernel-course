@@ -13,7 +13,7 @@ The following BLAS kernels have been implemented in multiple frameworks. For eac
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | axpby | update vector| $y = \alpha x + \beta y$ | $3n$ | $3n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | scal | scale vector | $y = \alpha y$ | $n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| copy | copy vector | $y = x$ | $0$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| [copy](./docs/copy.md) | copy vector | $y = x$ | $0$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | swap | swap vectors | $x \leftrightarrow y$ | $0$ | $4n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | dot | dot product | $z = x^\top y$ | $2n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | gemv | general matrix-vector multiply | $y = \alpha A x + \beta y$ | $2mn$ | $mn + n + 2m$ | ❌ | ❌ | ❌ | ❌ | ❌ |
