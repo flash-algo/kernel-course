@@ -11,11 +11,11 @@ The following BLAS kernels have been implemented in multiple frameworks. For eac
 
 | Name | Description | Equation | Flops | Data | Python | PyTorch | Triton | CuTe | Test |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| axpy | update vector| $ y = y + \alpha x $ | $ 2n $ | $ 2n $ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| scal | scale vector | $ y = \alpha y $ | $ n $ | $ n $ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| copy | copy vector | $ y = x $ | $ 0 $ | $ 2n $ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| swap | swap vectors | $ x \leftrightarrow y $ | $ 0 $ | $ 2n $ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| dot | dot product | $ = x^\top y $ | $ 2n $ | $ 2n $ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| gemv | general matrix-vector multiply | $ y = \alpha A x + \beta y $ | $ 2mn $ | $ mn + m + n $ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| ger | general rank-1 update | $ A = A + \alpha x y^\top $ | $ 2mn $ | $ mn $ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| gemm | general matrix-matrix multiply | $ C = \alpha A B + \beta C $ | $ 2mnk $ | $ mk + nk + mn $ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| axpy | update vector| $y = y + \alpha x$ | $2n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| scal | scale vector | $y = \alpha y$ | $n$ | $n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| copy | copy vector | $y = x$ | $0$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| swap | swap vectors | $x \leftrightarrow y$ | $0$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| dot | dot product | $= x^\top y$ | $2n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| gemv | general matrix-vector multiply | $y = \alpha A x + \beta y$ | $2mn$ | $mn + m + n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| ger | general rank-1 update | $A = A + \alpha x y^\top$ | $2mn$ | $mn$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| gemm | general matrix-matrix multiply | $C = \alpha A B + \beta C$ | $2mnk$ | $mk + nk + mn$ | ❌ | ❌ | ❌ | ❌ | ❌ |
