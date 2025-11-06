@@ -17,10 +17,10 @@ The following common BLAS kernels have been implemented in multiple frameworks. 
 
 | Name | Description | Equation | Flops | Data | Python | PyTorch | Triton | CuTe | Test |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| axpby | update vector| $y = \alpha x + \beta y$ | $3n$ | $3n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| scal | scale vector | $y = \alpha y$ | $n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | [copy](./docs/copy.md) | copy vector | $y = x$ | $0$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | swap | swap vectors | $x \leftrightarrow y$ | $0$ | $4n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| scal | scale vector | $y = \alpha y$ | $n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| axpby | update vector| $y = \alpha x + \beta y$ | $3n$ | $3n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | dot | dot product | $z = x^\top y$ | $2n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | gemv | general matrix-vector multiply | $y = \alpha A x + \beta y$ | $2mn$ | $mn + n + 2m$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | geru | general rank-1 update | $A = A + \alpha x y^\top$ | $2mn$ | $2mn + m + n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
