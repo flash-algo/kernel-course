@@ -5,6 +5,11 @@
 Learn how to develop high-performance kernels with [PyTorch](https://github.com/pytorch/pytorch), [Triton](https://github.com/triton-lang/triton), and [CuTe](https://github.com/NVIDIA/cutlass) while preserving numerical equivalence with the Python reference implementations. The exercises emphasize translating clear Python prototypes into optimized GPU kernels without sacrificing correctness.
 
 
+## Why This Course?
+
+Learning high-performance computing as a non-CS major has been quite challenging for me. While I can grasp the fundamental concepts of HPC, I often struggle with effectively utilizing various frameworks to combine mathematical computations, memory layouts, and data transfers efficiently. To address this, I selected three popular frameworks: PyTorch for rapid mathematical implementations, Triton for parallel computations, and CuTe for maximizing performance through low-level memory management and thread scheduling. By progressively implementing foundational linear algebra operations in these frameworks and combining them into Transformer modules, I aim to enhance my skills. I believe this process will be beneficial to others as well, so I've decided to document it for sharing. Happy learning!
+
+
 ## Basic Linear Algebra Subprograms
 
 The following common BLAS kernels have been implemented in multiple frameworks. For each kernel, a ✅ indicates that the implementation is complete and verified to be numerically equivalent to the Python reference, a ❌ indicates that the implementation is pending. For more details on each kernel, please **click the name or icon**.
