@@ -1,30 +1,3 @@
-"""Lightweight benchmarking helpers for course exercises.
-
-This module provides a small harness that test cases can use to compare
-multiple kernel implementations (plain Python, PyTorch, Triton, CuTe, ...)
-for both correctness and wall-clock performance.  A typical workflow is:
-
-.. code-block:: python
-
-    from kernel_course import testing
-    from kernel_course.python_ops import add as python_impl
-    from kernel_course.triton_ops import add as triton_impl
-
-    inputs = testing.static_input_factory(a, b)
-    implementations = [
-        testing.Implementation("python", python_impl.add, testing.Backend.PYTHON),
-        testing.Implementation("torch", torch.add, testing.Backend.PYTORCH),
-        testing.Implementation("triton", triton_impl.add, testing.Backend.TRITON),
-    ]
-
-    results = testing.benchmark_many(implementations, inputs)
-    testing.assert_close_to_baseline(results)
-    print(testing.format_results(results))
-
-The harness keeps the API surface intentionally small so that individual
-exercises can extend it with their own convenience wrappers if desired.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -37,32 +10,26 @@ import torch
 
 __all__ = [
     "Backend",
+    "Implementation",
     "BenchmarkConfig",
     "BenchmarkResult",
-    "Implementation",
-    "static_input_factory",
-    "benchmark_impl",
-    "benchmark_many",
-    "assert_close_to_baseline",
-    "format_results",
+    "run_benchmarks",
+    "show_benchmarks",
 ]
 
 
 class Backend(str, Enum):
-    """Identifier for the execution environment of an implementation."""
 
     PYTHON = "python"
     PYTORCH = "pytorch"
     TRITON = "triton"
     CUTE = "cute"
 
-    def __str__(self) -> str:  # pragma: no cover - trivial
+    def __str__(self) -> str:
         return self.value
 
 
 def _torch_synchronize_if_available() -> None:
-    """Synchronize the CUDA device when available."""
-
     if torch.cuda.is_available():
         torch.cuda.synchronize()
 
@@ -119,6 +86,7 @@ class BenchmarkResult:
 
     impl: Implementation
     timings_ms: Sequence[float]
+    flops: float
     output: Any
 
     @property
@@ -133,141 +101,151 @@ class BenchmarkResult:
     def worst_ms(self) -> float:
         return max(self.timings_ms)
 
+    @property
+    def tflops(self) -> float:
+        seconds = self.mean_ms / 1e3
+        return self.flops / seconds / 1e12
+
     def speedup_vs(self, baseline: "BenchmarkResult") -> float:
         return baseline.mean_ms / self.mean_ms
 
 
-ArgsFactory = Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]]
-
-
-def _clone_tree(value: Any) -> Any:
-    """Clone torch tensors inside arbitrarily nested containers."""
-
-    if isinstance(value, torch.Tensor):
-        return value.clone()
-    if isinstance(value, (list, tuple)):
-        cloned = [_clone_tree(v) for v in value]
-        return type(value)(cloned)
-    if isinstance(value, dict):
-        return {k: _clone_tree(v) for k, v in value.items()}
-    if isinstance(value, set):
-        return type(value)(_clone_tree(v) for v in value)
-    return value
-
-
-def static_input_factory(*args: Any, **kwargs: Any) -> ArgsFactory:
-    """Return a callable that recreates the provided inputs for each run."""
-
-    def factory() -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
-        return _clone_tree(args), _clone_tree(kwargs)
-
-    return factory
-
-
-def _run_once(impl: Implementation, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> Any:
-    impl.synchronize()
-    result = impl(*args, **kwargs)
-    impl.synchronize()
-    return result
-
-
-def benchmark_impl(
+def _run_benchmark(
     impl: Implementation,
-    input_factory: ArgsFactory,
-    config: BenchmarkConfig | None = None,
+    factory: Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]],
+    *,
+    flops: float,
+    config: Optional[BenchmarkConfig] = None,
 ) -> BenchmarkResult:
-    """Benchmark a single implementation using the provided input factory."""
+    """
+    Run benchmark for a single implementation.
 
-    cfg = config or BenchmarkConfig()
+    Args:
+        impl: The implementation to benchmark.
+        factory: Callable producing ``(args, kwargs)`` per invocation. It should
+            return a tuple where the first element is a tuple of positional
+            arguments and the second element is a dict of keyword arguments.
+        flops: Total floating-point operations performed by one invocation.
+        config: Benchmark configuration. Defaults to ``BenchmarkConfig()``.
 
-    # Warmup runs to amortize setup and cache effects.
-    for _ in range(cfg.warmup):
-        args, kwargs = input_factory()
-        _run_once(impl, args, kwargs)
+    Returns:
+        BenchmarkResult: Aggregated timings, last output, and FLOPs metadata.
+    """
+    if config is None:
+        config = BenchmarkConfig()
 
+    # Warmup (not timed)
+    for _ in range(config.warmup):
+        args, kwargs = factory()
+        impl.synchronize()
+        _ = impl(*args, **kwargs)
+        impl.synchronize()
+
+    # Timed repeats
     timings_ms: List[float] = []
-    final_output: Any = None
-    for _ in range(cfg.repeat):
-        args, kwargs = input_factory()
+    output: Any = None
+    for _ in range(config.repeat):
+        args, kwargs = factory()
         impl.synchronize()
         start = perf_counter()
-        final_output = impl(*args, **kwargs)
+        output = impl(*args, **kwargs)
         impl.synchronize()
-        timings_ms.append((perf_counter() - start) * 1e3)
+        end = perf_counter()
+        timings_ms.append((end - start) * 1e3)
 
-    assert final_output is not None
-    return BenchmarkResult(impl=impl, timings_ms=timings_ms, output=final_output)
+    return BenchmarkResult(
+        impl=impl,
+        timings_ms=timings_ms,
+        flops=flops,
+        output=output,
+    )
 
 
-def benchmark_many(
-    implementations: Sequence[Implementation],
-    input_factory: ArgsFactory,
-    config: BenchmarkConfig | None = None,
+def run_benchmarks(
+    impls: Iterable[Implementation],
+    factory: Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]],
+    *,
+    flops: float,
+    config: Optional[BenchmarkConfig] = None,
 ) -> List[BenchmarkResult]:
-    """Benchmark a collection of implementations with shared inputs."""
+    """
+    Run benchmarks for multiple implementations, optionally validating outputs.
 
-    if not implementations:
-        raise ValueError("No implementations provided for benchmarking")
+    The first implementation is treated as the numerical baseline.
+    If `validate` is True, every other implementation's single sample output 
+    is compared against the baseline output produced from its own fresh
+    factory invocation.
+    """
+    impl_list = list(impls)
+    if not impl_list:
+        return []
 
-    cfg = config or BenchmarkConfig()
-    results = [benchmark_impl(impl, input_factory, cfg) for impl in implementations]
+    # Establish baseline output
+    baseline_impl = impl_list[0]
+    base_args, base_kwargs = factory()
+    baseline_output = baseline_impl(*base_args, **base_kwargs)
+    if baseline_output.dtype == torch.float32:
+        rtol = 1e-5
+        atol = 1e-8
+    elif baseline_output.dtype == torch.float16:
+        rtol = 1e-3
+        atol = 1e-5
+    elif baseline_output.dtype == torch.bfloat16:
+        rtol = 1e-2
+        atol = 1e-3
+    else:
+        rtol = 1e-5
+        atol = 1e-8
+
+    results: List[BenchmarkResult] = []
+    for impl in impl_list:
+        args, kwargs = factory()
+        out = impl(*args, **kwargs)
+
+        if not torch.allclose(out, baseline_output, rtol=rtol, atol=atol):
+            raise AssertionError(
+                f"Output mismatch vs baseline for '{impl.name}' backend={impl.backend}"
+            )
+
+        res = _run_benchmark(impl, factory, flops=flops, config=config)
+        results.append(res)
     return results
 
 
-def _assert_close(a: Any, b: Any, *, rtol: float, atol: float) -> None:
-    if isinstance(a, torch.Tensor) and isinstance(b, torch.Tensor):
-        torch.testing.assert_close(a, b, rtol=rtol, atol=atol)
-        return
-    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):
-        if len(a) != len(b):
-            raise AssertionError("Sequences do not share the same length")
-        for lhs, rhs in zip(a, b):
-            _assert_close(lhs, rhs, rtol=rtol, atol=atol)
-        return
-    if isinstance(a, dict) and isinstance(b, dict):
-        if a.keys() != b.keys():
-            raise AssertionError("Dictionaries do not share the same keys")
-        for key in a:
-            _assert_close(a[key], b[key], rtol=rtol, atol=atol)
-        return
-    if a != b:
-        raise AssertionError(f"Values differ: {a!r} != {b!r}")
+def show_benchmarks(results: Sequence[BenchmarkResult]) -> None:
+    """
+    Pretty-print benchmark results.
 
-
-def assert_close_to_baseline(
-    results: Sequence[BenchmarkResult],
-    *,
-    rtol: float = 1e-4,
-    atol: float = 1e-5,
-) -> None:
-    """Check every result against the first one, used as baseline."""
-
+    If multiple results are provided, the first is treated as the baseline for
+    speedup computation.
+    """
     if not results:
-        raise ValueError("No results to validate")
+        print("No results to display.")
+        return
 
     baseline = results[0]
-    for candidate in results[1:]:
-        try:
-            _assert_close(candidate.output, baseline.output, rtol=rtol, atol=atol)
-        except AssertionError as exc:  # pragma: no cover - tiny wrapper
-            raise AssertionError(
-                f"Implementation '{candidate.impl.name}' diverged from baseline "
-                f"'{baseline.impl.name}'"
-            ) from exc
 
+    # Header
+    headers = (
+        "name",
+        "backend",
+        "mean_ms",
+        "best_ms",
+        "worst_ms",
+        "speedup",
+        "tflops",
+    )
+    print(
+        f"\n{headers[0]:<16} {headers[1]:<10} {headers[2]:>10} {headers[3]:>10} {headers[4]:>10} {headers[5]:>8} {headers[6]:>10}"
+    )
+    print("-" * 80)
 
-def format_results(results: Sequence[BenchmarkResult]) -> str:
-    """Render benchmark results as a small text table."""
-
-    if not results:
-        return "<no results>"
-
-    baseline = results[0]
-    rows = ["name backend mean_ms best_ms speedup"]
-    for entry in results:
-        speedup = entry.speedup_vs(baseline) if entry is not baseline else 1.0
-        rows.append(
-            f"{entry.impl.name} {entry.impl.backend.value} "
-            f"{entry.mean_ms:8.3f} {entry.best_ms:8.3f} {speedup:7.2f}"
+    for r in results:
+        speed = r.speedup_vs(baseline)
+        tflops_val = r.tflops if r.flops > 0 else 0.0
+        print(
+            f"{r.impl.name:<16} {str(r.impl.backend):<10} "
+            f"{r.mean_ms:>10.3f} {r.best_ms:>10.3f} {r.worst_ms:>10.3f} "
+            f"{speed:>8.2f} {tflops_val:>10.3f}"
         )
-    return "\n".join(rows)
+
