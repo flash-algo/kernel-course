@@ -14,12 +14,10 @@ The assignment is performed element by element and leaves `x` unchanged.
 
 ## Kernel Implementations
 
-| Backend | Notes |
-| --- | --- |
-| [Python](../kernel_course/python_ops/copy.py) | Pure Python + PyTorch utilities provide the numerical ground truth. |
-| [PyTorch](../kernel_course/pytorch_ops/copy.py) | Leverages native PyTorch routines for a quick implementation. |
-| [Triton](../kernel_course/triton_ops/copy.py) | Demonstrates block scheduling plus masked loads and stores. |
-| [CuTe](../kernel_course/cute_ops/copy.py) | Highlights tile composition, alignment, and shared-memory usage. |
+- [Python Implementation](../kernel_course/python_ops/copy.py)
+- [PyTorch Implementation](../kernel_course/pytorch_ops/copy.py)
+- [Triton Implementation](../kernel_course/triton_ops/copy.py)
+- [CuTe Implementation](../kernel_course/cute_ops/copy.py)
 
 All backends share the interface:
 
@@ -32,9 +30,13 @@ def copy(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 
 See the [test suite](../tests/test_copy.py) for the validation harness that exercises every backend.
 
-| Backend | Throughput |
-| --- | --- |
-| Python | n GB/s |
-| PyTorch | n GB/s |
-| Triton | n GB/s |
+```bash
+pytest tests/test_copy.py -s
+```
+
+| Backend | Speed | SpeedUp | TFLOPS | 
+| --- | --- | --- | --- |
+| Python | 0.008 ms | 1.00x | 0.000 TFLOPS |
+| PyTorch | 0.020 ms | 0.43x | 0.000 TFLOPS |
+| Triton | 0.037 ms | 0.23x | 0.000 TFLOPS |
 | CuTe | n GB/s |
