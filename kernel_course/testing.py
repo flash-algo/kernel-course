@@ -227,25 +227,22 @@ def show_benchmarks(results: Sequence[BenchmarkResult]) -> None:
 
     # Header
     headers = (
-        "name",
         "backend",
-        "mean_ms",
-        "best_ms",
-        "worst_ms",
+        "speed (ms)",
         "speedup",
         "tflops",
     )
     print(
-        f"\n{headers[0]:<16} {headers[1]:<10} {headers[2]:>10} {headers[3]:>10} {headers[4]:>10} {headers[5]:>8} {headers[6]:>10}"
+        f"\n{headers[0]:<10} {headers[1]:>10} {headers[2]:>8} {headers[3]:>10}"
     )
-    print("-" * 80)
+    print("-" * 42)
 
     for r in results:
         speed = r.speedup_vs(baseline)
-        tflops_val = r.tflops if r.flops > 0 else 0.0
+        tflops = r.tflops if r.flops > 0 else 0.0
         print(
-            f"{r.impl.name:<16} {str(r.impl.backend):<10} "
-            f"{r.mean_ms:>10.3f} {r.best_ms:>10.3f} {r.worst_ms:>10.3f} "
-            f"{speed:>8.2f} {tflops_val:>10.3f}"
+            f"{str(r.impl.backend):<10} "
+            f"{r.mean_ms:>10.3f} "
+            f"{speed:>8.2f} {tflops:>10.3f}"
         )
 
