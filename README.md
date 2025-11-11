@@ -17,7 +17,7 @@ The following common BLAS kernels have been implemented in multiple frameworks. 
 
 | Name | Description | Equation | Flops | Data | Python | PyTorch | Triton | CuTe | Test |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| [copy](./docs/copy.md) | copy vector | $y = x$ | $0$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| [copy](./docs/copy.md) | copy vector | $y = x$ | $0$ | $2n$ | [✅](./kernel_course/python_ops/copy.py) | [✅](./kernel_course/pytorch_ops/copy.py) | [✅](./kernel_course/triton_ops/copy.py) | ❌ | [✅](./tests/test_copy.py) |
 | swap | swap vectors | $x \leftrightarrow y$ | $0$ | $4n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | scal | scale vector | $y = \alpha y$ | $n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | axpby | update vector| $y = \alpha x + \beta y$ | $3n$ | $3n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
