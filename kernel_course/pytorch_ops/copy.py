@@ -7,7 +7,7 @@ def copy(
     y: torch.Tensor,
 ) -> torch.Tensor:
     """
-    Copies the contents of tensor `x` into tensor `y`.
+    Copies the contents of tensor `x` into tensor `y` using PyTorch operations.
 
     Args:
         x (torch.Tensor): Source tensor.
