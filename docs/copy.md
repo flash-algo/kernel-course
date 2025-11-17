@@ -33,10 +33,3 @@ See the [test suite](../tests/test_copy.py) for the validation harness that exer
 ```bash
 pytest tests/test_copy.py -s
 ```
-
-| Backend | Speed | SpeedUp | TFLOPS | 
-| --- | --- | --- | --- |
-| Python | 0.008 ms | 1.00x | 0.000 TFLOPS |
-| PyTorch | 0.020 ms | 0.43x | 0.000 TFLOPS |
-| Triton | 0.037 ms | 0.23x | 0.000 TFLOPS |
-| CuTe | n GB/s |
