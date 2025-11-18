@@ -84,7 +84,7 @@ When using kernel-course:
 
 For security-related questions or concerns:
 - Primary: losercheems@gmail.com
-- Project maintainers: See [AUTHORS](AUTHORS) file
+- Project maintainers: See [GitHub contributors](https://github.com/flash-algo/kernel-course/graphs/contributors)
 
 For general support:
 - GitHub Issues: https://github.com/flash-algo/kernel-course/issues
