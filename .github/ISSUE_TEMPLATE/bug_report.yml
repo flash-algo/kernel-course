@@ -33,7 +33,7 @@ body:
     validations:
       required: true
   - type: textarea
-    id: expected-behavior
+    id: expected-behaviour
     attributes:
       label: Expected behaviour
       description: Tell us what you expected to happen instead.
