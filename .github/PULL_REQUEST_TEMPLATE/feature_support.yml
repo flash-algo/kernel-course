@@ -54,7 +54,7 @@ body:
       label: Checklist
       options:
         - label: Linked issue provided
-        - label: API stabilised
+        - label: API stabilized
         - label: Tests added or updated
         - label: Docs added or updated
         - label: No known performance regressions
