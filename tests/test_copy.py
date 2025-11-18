@@ -47,9 +47,19 @@ def factory(
 				not torch.cuda.is_available(), reason="requires CUDA"
 			),
 		),
+		pytest.param(
+			torch.device("mps"),
+			marks=pytest.mark.skipif(
+				not torch.backends.mps.is_available(), reason="requires MPS"
+			),
+		),
 	],
 )
-def test_copy_benchmark(device: torch.device) -> None:
+@pytest.mark.parametrize(
+    "dtype",
+    [torch.float32, torch.float16, torch.bfloat16, torch.int32, torch.bool],
+)
+def test_copy_benchmark(device: torch.device, dtype: torch.dtype) -> None:
 	impls: List[testing.Implementation] = [
 		testing.Implementation("python", python_copy.copy, testing.Backend.PYTHON),
 	]
@@ -65,10 +75,10 @@ def test_copy_benchmark(device: torch.device) -> None:
 
 	numel = 1 << 16
 	# Benchmark each implementation
-	config = testing.BenchmarkConfig(warmup=2, repeat=5)
+	config = testing.BenchmarkConfig(warmup=3, repeat=1_000)
 	results = testing.run_benchmarks(
 		impls,
-		lambda: factory(numel, device),
+		lambda: factory(numel, device, dtype),
 		flops=0.0,
 		config=config,
 	)
