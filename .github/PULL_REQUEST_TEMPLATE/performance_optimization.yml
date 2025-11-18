@@ -1,0 +1,61 @@
+name: Performance Optimization
+description: Optimize performance with benchmark evidence
+title: "[PERFORMANCE OPTIMIZATION] "
+labels:
+  - performance
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Document the optimization, methodology, and results so reviewers can validate gains and correctness for kernel-course kernels.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is optimized and why?
+      placeholder: Improves performance of a kernel (e.g. copy, swap, axpby, gemm, ...) on specific devices/dtypes...
+    validations:
+      required: true
+  - type: textarea
+    id: baseline
+    attributes:
+      label: Baseline metrics
+      description: Provide the current performance numbers and environment.
+      placeholder: Baseline speed 0.25 ms for `copy` with n=1<<20 on A100, float16, PyTorch backend...
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Approach
+      description: Describe the optimization techniques used.
+      placeholder: Introduced better tiling, memory access patterns, or Triton/CuTe scheduling...
+  - type: textarea
+    id: results
+    attributes:
+      label: Results
+      description: Share before/after benchmarks and how to reproduce them.
+      placeholder: |
+        Before: 0.25 ms/iteration (`python benchmarks/copy_bench.py --backend=triton`)
+        After: 0.16 ms/iteration (same command)
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Note memory, throughput trade-offs, or hardware-specific considerations.
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      description: Highlight edge cases, correctness risks, or gating tests added.
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Linked issue provided
+        - label: Benchmarks included and reproducible
+        - label: No accuracy regression
+        - label: Docs updated where needed

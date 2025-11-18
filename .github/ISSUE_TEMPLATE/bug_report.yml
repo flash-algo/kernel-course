@@ -1,0 +1,63 @@
+name: Bug report
+description: Create a report to help us improve kernel-course
+title: "[BUG REPORT] "
+labels:
+  - bug
+assignees:
+  - LoserCheems
+  - SNHuan
+  - wubingheng111
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue. Please fill out the details below so we can reproduce and fix the problem quickly.
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: Provide a concise description of the incorrect behaviour.
+      placeholder: Unexpected error when running a kernel (e.g. copy, swap, axpby, ...)
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Share the minimal steps or code necessary for us to see the failure.
+      placeholder: |
+        1. Run the relevant test, e.g. `pytest tests/test_copy.py -k "copy"`
+        2. Or run a minimal script that imports a kernel from `kernel_course.*`
+        3. Observe the error or numerical mismatch
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected behaviour
+      description: Tell us what you expected to happen instead.
+      placeholder: The kernel or test should run without errors and produce numerically correct results.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment information
+      description: Run the following command and paste the full output.
+      placeholder: |
+        python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.version.cuda}'); print(f'GPU: {torch.cuda.get_device_name() if torch.cuda.is_available() else \"None\"}')"
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Include problem sizes (n/m/k), device, dtype, or any other details that might help us debug.
+  - type: textarea
+    id: traceback
+    attributes:
+      label: Error traceback
+      description: Paste the full traceback if available.
+      render: text

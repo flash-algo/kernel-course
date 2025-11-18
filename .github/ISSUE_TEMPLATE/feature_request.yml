@@ -1,0 +1,59 @@
+name: Feature request
+description: Suggest an idea for kernel-course (new kernels, backends, or tooling)
+title: "[FEATURE REQUEST] "
+labels:
+  - feature
+assignees:
+  - LoserCheems
+  - SNHuan
+  - wubingheng111
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us understand the feature you are proposing and why it matters for kernel-course workflows (e.g. new BLAS kernels, Transformer modules, or benchmarking utilities).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: Explain the problem or limitation that motivates this feature request.
+      placeholder: I am limited by...
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or behaviour you would like to see.
+      placeholder: Introduce a new kernel or backend (e.g. add `axpby` Triton implementation, support a new device, add mixed-precision benchmarks, ...)
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: List any other approaches you have evaluated and why they are insufficient.
+      placeholder: I tried using...
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation details
+      description: Call out potential Python/CUDA/Triton changes, performance implications, or compatibility considerations.
+      placeholder: Requires adding `kernel_course.triton_ops.axpby` and updating tests/benchmarks...
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: Describe the workloads or scenarios that would benefit from this feature.
+      placeholder: Long-context code completion with...
+  - type: textarea
+    id: references
+    attributes:
+      label: Related work
+      description: Share links to papers, repositories, or prior art that inspired this request.
+      placeholder: Paper link or repository URL
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any extra information or screenshots that may help us understand the request.
