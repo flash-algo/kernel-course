@@ -228,21 +228,29 @@ def show_benchmarks(results: Sequence[BenchmarkResult]) -> None:
     # Header
     headers = (
         "backend",
-        "speed (ms)",
+        "dtype",
+        "speed",
         "speedup",
         "tflops",
     )
     print(
-        f"\n{headers[0]:<10} {headers[1]:>10} {headers[2]:>8} {headers[3]:>10}"
+        f"\n{headers[0]:<10} {headers[1]:>10} {headers[2]:>10} {headers[3]:>10} {headers[4]:>10}"
     )
-    print("-" * 42)
+    print("-" * 54)
 
     for r in results:
         speed = r.speedup_vs(baseline)
         tflops = r.tflops if r.flops > 0 else 0.0
+
+        if hasattr(r.output, "dtype"):
+            dtype_str = str(r.output.dtype).replace("torch.", "")
+        else:
+            dtype_str = "-"
+
         print(
             f"{str(r.impl.backend):<10} "
+            f"{dtype_str:>10} "
             f"{r.mean_ms:>10.3f} "
-            f"{speed:>8.2f} {tflops:>10.3f}"
+            f"{speed:>10.2f} {tflops:>10.3f}"
         )
 
