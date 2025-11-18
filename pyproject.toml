@@ -45,4 +45,3 @@ exclude = [
   "dist",
 ]
 
-[tool.setuptools]
