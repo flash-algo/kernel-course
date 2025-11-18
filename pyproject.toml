@@ -1,0 +1,48 @@
+[build-system]
+requires = [
+  "setuptools>=64",
+  "wheel",
+  "packaging",
+  "ninja",
+  "torch>=2.5.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kernel-course"
+dynamic = ["version"]
+description = "Educational project for implementing and benchmarking kernels in Python, PyTorch, Triton, and CuTe."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+dependencies = [
+  "torch",
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: Unix"
+]
+
+[project.urls]
+Homepage = "https://github.com/flash-algo/kernel-course"
+Source = "https://github.com/flash-algo/kernel-course"
+Issues = "https://github.com/flash-algo/kernel-course/issues"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=6.0",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "kernel_course.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kernel_course*"]
+exclude = [
+  "build",
+  "dist",
+]
+
+[tool.setuptools]
