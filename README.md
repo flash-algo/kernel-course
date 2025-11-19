@@ -19,7 +19,7 @@ The following common BLAS kernels have been implemented in multiple frameworks. 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [copy](./docs/copy.md) | copy vector | $y = x$ | $0$ | $2n$ | [✅](./kernel_course/python_ops/copy.py) | [✅](./kernel_course/pytorch_ops/copy.py) | [✅](./kernel_course/triton_ops/copy.py) | ❌ | [✅](./tests/test_copy.py) |
 | [swap](./docs/swap.md) | swap vectors | $x \leftrightarrow y$ | $0$ | $4n$ | [✅](./kernel_course/python_ops/swap.py) | [✅](./kernel_course/pytorch_ops/swap.py) | [✅](./kernel_course/triton_ops/swap.py) | ❌ | [✅](./tests/test_swap.py) |
-| scal | scale vector | $y = \alpha y$ | $n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| [scal](./docs/scal.md) | scale vector | $y = \alpha y$ | $n$ | $2n$ | [✅](./kernel_course/python_ops/scal.py) | ❌ | ❌ | ❌ | ❌ |
 | axpby | update vector| $y = \alpha x + \beta y$ | $3n$ | $3n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | dot | dot product | $z = x^\top y$ | $2n$ | $2n$ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | gemv | general matrix-vector multiply | $y = \alpha A x + \beta y$ | $2mn$ | $mn + n + 2m$ | ❌ | ❌ | ❌ | ❌ | ❌ |
