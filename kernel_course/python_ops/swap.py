@@ -13,8 +13,8 @@ def swap(
         y (torch.Tensor): Second tensor.
     
     Returns:
-        Tuple[torch.Tensor, torch.Tensor]: The swapped tensors `(x, y)`.
+        Tuple[torch.Tensor, torch.Tensor]: The swapped tensors `y`.
     """
 
     x, y = y, x
-    return x, y
+    return y
