@@ -1,10 +1,10 @@
-from typing import Optional, Tuple
+from typing import Optional
 import torch
 
 def swap(
     x: torch.Tensor,
     y: torch.Tensor,
-) -> Tuple[torch.Tensor, torch.Tensor]:
+) -> torch.Tensor:
     """
     Swaps the contents of tensor `x` with tensor `y` using PyTorch operations.
 
@@ -13,10 +13,10 @@ def swap(
         y (torch.Tensor): Second tensor.
     
     Returns:
-        Tuple[torch.Tensor, torch.Tensor]: The swapped tensors `(x, y)`.
+        torch.Tensor: The swapped tensor `y`.
     """
 
     temp = x.clone()
     x.copy_(y)
     y.copy_(temp)
-    return x, y
+    return y
