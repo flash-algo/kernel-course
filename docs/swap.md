@@ -22,7 +22,7 @@ The assignment is performed element by element, swapping the values between `x` 
 All backends share the interface:
 
 ```python
-def swap(x: torch.Tensor, y: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+def swap(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     ...
 ```
 
