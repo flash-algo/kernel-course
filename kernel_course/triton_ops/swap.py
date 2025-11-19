@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 import torch
 import triton
@@ -40,7 +40,7 @@ def swap_kernel(
 def swap(
     x: torch.Tensor,
     y: torch.Tensor,
-) -> Tuple[torch.Tensor, torch.Tensor]:
+) -> torch.Tensor:
     """
     Swaps the contents of tensor `x` with tensor `y` using a Triton kernel.
 
@@ -49,7 +49,7 @@ def swap(
         y (torch.Tensor): Second tensor.
     
     Returns:
-        Tuple[torch.Tensor, torch.Tensor]: The tensors `x` and `y` after swapping their contents.
+        torch.Tensor: The swapped tensor `y`.
     """
 
     # Calculate the number of elements in the input tensor
