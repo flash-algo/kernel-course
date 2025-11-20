@@ -13,6 +13,7 @@ __all__ = [
     "Implementation",
     "BenchmarkConfig",
     "BenchmarkResult",
+    "get_impls",
     "run_benchmarks",
     "show_benchmarks",
 ]
@@ -158,6 +159,36 @@ def _run_benchmark(
         flops=flops,
         output=output,
     )
+
+
+def get_impls(
+    *,
+    python_impl: Callable[..., Any],
+    pytorch_impl: Optional[Callable[..., Any]] = None,
+    triton_impl: Optional[Callable[..., Any]] = None,
+    cute_impl: Optional[Callable[..., Any]] = None,
+) -> List[Implementation]:
+    """
+    Construct a default list of implementations for benchmarking.
+
+    The Python implementation is always used as the baseline. Backend-specific
+    implementations are included only if a callable is provided.
+    """
+
+    impls: List[Implementation] = [
+        Implementation("python", python_impl, Backend.PYTHON),
+    ]
+
+    if pytorch_impl is not None:
+        impls.append(Implementation("pytorch", pytorch_impl, Backend.PYTORCH))
+
+    if triton_impl is not None:
+        impls.append(Implementation("triton", triton_impl, Backend.TRITON))
+
+    if cute_impl is not None:
+        impls.append(Implementation("cute", cute_impl, Backend.CUTE))
+
+    return impls
 
 
 def run_benchmarks(
