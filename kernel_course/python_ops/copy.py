@@ -1,4 +1,3 @@
-from typing import Optional
 import torch
 
 
@@ -12,7 +11,7 @@ def copy(
     Args:
         x (torch.Tensor): Source tensor.
         y (torch.Tensor): Destination tensor.
-    
+
     Returns:
         torch.Tensor: The destination tensor `y`.
     """
