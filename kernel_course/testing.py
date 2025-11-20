@@ -19,7 +19,6 @@ __all__ = [
 
 
 class Backend(str, Enum):
-
     PYTHON = "python"
     PYTORCH = "pytorch"
     TRITON = "triton"
@@ -172,7 +171,7 @@ def run_benchmarks(
     Run benchmarks for multiple implementations, optionally validating outputs.
 
     The first implementation is treated as the numerical baseline.
-    If `validate` is True, every other implementation's single sample output 
+    If `validate` is True, every other implementation's single sample output
     is compared against the baseline output produced from its own fresh
     factory invocation.
     """
@@ -253,4 +252,3 @@ def show_benchmarks(results: Sequence[BenchmarkResult]) -> None:
             f"{r.mean_ms:>10.3f} "
             f"{speed:>10.2f} {tflops:>10.3f}"
         )
-
