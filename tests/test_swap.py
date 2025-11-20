@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 import torch
 
@@ -8,6 +6,7 @@ from kernel_course.python_ops import swap as python_swap
 
 try:
     from kernel_course.pytorch_ops import swap as pytorch_swap
+
     HAS_PYTORCH = True
 except Exception:
     pytorch_swap = None
@@ -15,6 +14,7 @@ except Exception:
 
 try:
     from kernel_course.triton_ops import swap as triton_swap
+
     HAS_TRITON = True
 except Exception:
     triton_swap = None
@@ -22,6 +22,7 @@ except Exception:
 
 try:
     from kernel_course.cute_ops import swap as cute_swap
+
     HAS_CUTE = True
 except Exception:
     cute_swap = None
@@ -60,18 +61,12 @@ def factory(
     [torch.float32, torch.float16, torch.bfloat16, torch.int32, torch.bool],
 )
 def test_swap_benchmark(device: torch.device, dtype: torch.dtype) -> None:
-    impls: List[testing.Implementation] = [
-        testing.Implementation("python", python_swap.swap, testing.Backend.PYTHON),
-    ]
-    impls.append(
-        testing.Implementation("pytorch", pytorch_swap.swap, testing.Backend.PYTORCH)
-    ) if HAS_PYTORCH else None
-    impls.append(
-        testing.Implementation("triton", triton_swap.swap, testing.Backend.TRITON)
-    ) if HAS_TRITON else None
-    impls.append(
-        testing.Implementation("cute", cute_swap.swap, testing.Backend.CUTE)
-    ) if HAS_CUTE else None
+    impls = testing.get_impls(
+        python_impl=python_swap.swap,
+        pytorch_impl=pytorch_swap.swap if HAS_PYTORCH else None,
+        triton_impl=triton_swap.swap if HAS_TRITON else None,
+        cute_impl=cute_swap.swap if HAS_CUTE else None,
+    )
 
     numel = 1 << 16
     # Benchmark each implementation
