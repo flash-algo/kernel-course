@@ -13,13 +13,13 @@ __all__ = [
     "Implementation",
     "BenchmarkConfig",
     "BenchmarkResult",
+    "get_impls",
     "run_benchmarks",
     "show_benchmarks",
 ]
 
 
 class Backend(str, Enum):
-
     PYTHON = "python"
     PYTORCH = "pytorch"
     TRITON = "triton"
@@ -161,6 +161,36 @@ def _run_benchmark(
     )
 
 
+def get_impls(
+    *,
+    python_impl: Callable[..., Any],
+    pytorch_impl: Optional[Callable[..., Any]] = None,
+    triton_impl: Optional[Callable[..., Any]] = None,
+    cute_impl: Optional[Callable[..., Any]] = None,
+) -> List[Implementation]:
+    """
+    Construct a default list of implementations for benchmarking.
+
+    The Python implementation is always used as the baseline. Backend-specific
+    implementations are included only if a callable is provided.
+    """
+
+    impls: List[Implementation] = [
+        Implementation("python", python_impl, Backend.PYTHON),
+    ]
+
+    if pytorch_impl is not None:
+        impls.append(Implementation("pytorch", pytorch_impl, Backend.PYTORCH))
+
+    if triton_impl is not None:
+        impls.append(Implementation("triton", triton_impl, Backend.TRITON))
+
+    if cute_impl is not None:
+        impls.append(Implementation("cute", cute_impl, Backend.CUTE))
+
+    return impls
+
+
 def run_benchmarks(
     impls: Iterable[Implementation],
     factory: Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]],
@@ -172,7 +202,7 @@ def run_benchmarks(
     Run benchmarks for multiple implementations, optionally validating outputs.
 
     The first implementation is treated as the numerical baseline.
-    If `validate` is True, every other implementation's single sample output 
+    If `validate` is True, every other implementation's single sample output
     is compared against the baseline output produced from its own fresh
     factory invocation.
     """
@@ -253,4 +283,3 @@ def show_benchmarks(results: Sequence[BenchmarkResult]) -> None:
             f"{r.mean_ms:>10.3f} "
             f"{speed:>10.2f} {tflops:>10.3f}"
         )
-

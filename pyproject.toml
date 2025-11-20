@@ -29,6 +29,8 @@ Issues = "https://github.com/flash-algo/kernel-course/issues"
 [project.optional-dependencies]
 dev = [
   "pytest>=6.0",
+  "black",
+  "ruff",
 ]
 
 [tool.setuptools.dynamic]

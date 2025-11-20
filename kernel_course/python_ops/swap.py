@@ -1,5 +1,5 @@
-from typing import Optional
 import torch
+
 
 def swap(
     x: torch.Tensor,
@@ -11,7 +11,7 @@ def swap(
     Args:
         x (torch.Tensor): First tensor.
         y (torch.Tensor): Second tensor.
-    
+
     Returns:
         torch.Tensor: The swapped tensor `y`.
     """

@@ -1,5 +1,3 @@
-from typing import Optional
-
 import torch
 import triton
 import triton.language as tl
@@ -7,10 +5,10 @@ import triton.language as tl
 
 @triton.autotune(
     configs=[
-        triton.Config({'BLOCK_SIZE': 1024}, num_stages=4, num_warps=4),
-        triton.Config({'BLOCK_SIZE': 2048}, num_stages=4, num_warps=8),
+        triton.Config({"BLOCK_SIZE": 1024}, num_stages=4, num_warps=4),
+        triton.Config({"BLOCK_SIZE": 2048}, num_stages=4, num_warps=8),
     ],
-    key=['n_elements'],
+    key=["n_elements"],
 )
 @triton.jit
 def swap_kernel(
@@ -47,7 +45,7 @@ def swap(
     Args:
         x (torch.Tensor): First tensor.
         y (torch.Tensor): Second tensor.
-    
+
     Returns:
         torch.Tensor: The swapped tensor `y`.
     """
@@ -58,7 +56,9 @@ def swap(
     # The SPMD launch grid denotes the number of kernel instances that run it parallelly
     # It is analogous to CUDA launch grids. It can be either Tuple[int], or Callable(metaparameters) -> Tuple[int]
     # In this case, we use a 1D grid where the size is the number of blocks needed to cover all elements
-    grid = lambda meta: (triton.cdiv(n_elements, meta['BLOCK_SIZE']),)
+
+    def grid(meta):
+        return (triton.cdiv(n_elements, meta["BLOCK_SIZE"]),)
 
     # Each torch.tensor object is implicitly converted into a pointer to its first element
     # `triton.jit`'ed functions can be indexed with a launch grid to obtain a callable GPU kernel, Don't forget to pass meta-parameters as keyword arguments
