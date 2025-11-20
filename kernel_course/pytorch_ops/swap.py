@@ -19,4 +19,5 @@ def swap(
     temp = x.clone()
     x.copy_(y)
     y.copy_(temp)
+
     return y
