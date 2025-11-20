@@ -98,11 +98,33 @@ You will need basic `git` proficiency to contribute to kernel-course. You'll nee
 
 5. Develop the features in your branch.
 
-   As you work on your code, make sure the tests pass:
+   As you work on your code, you should make sure the test suite passes. For quick, focused checks, you can run only the tests impacted by your changes, for example:
 
    ```bash
-   pytest tests/ -v
+   pytest tests/<TEST_TO_RUN>.py
    ```
+
+   To keep the codebase consistent, kernel-course relies on **black** and **ruff** (via `ruff format` and `ruff check`) for formatting and linting. After you make changes, you can apply automatic style fixes and basic checks only on the files modified on your branch with:
+
+   ```bash
+   make fixup
+   ```
+
+   This target is optimized to operate on Python files that differ from `main`.
+
+   If you prefer to run style fixes on the whole codebase at once, use:
+
+   ```bash
+   make style
+   ```
+
+   Before opening a pull request, we recommend running the full quality gate:
+
+   ```bash
+   make quality
+   ```
+
+   which will run linting (`ruff check`), formatting checks (`ruff format --check`), and the test suite (`pytest tests`).
 
 6. Once you're happy with your changes, add changed files using `git add` and record your changes with `git commit`:
 
