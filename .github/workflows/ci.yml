@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  lint-and-test:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
