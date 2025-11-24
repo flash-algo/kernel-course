@@ -2,30 +2,30 @@ import pytest
 import torch
 
 from kernel_course import testing
-from kernel_course.python_ops import copy as python_copy
+from kernel_course.python_ops import scal as python_scal
 
 try:
-    from kernel_course.pytorch_ops import copy as pytorch_copy
+    from kernel_course.pytorch_ops import scal as pytorch_scal
 
     HAS_PYTORCH = True
 except Exception:
-    pytorch_copy = None
+    pytorch_scal = None
     HAS_PYTORCH = False
 
 try:
-    from kernel_course.triton_ops import copy as triton_copy
+    from kernel_course.triton_ops import scal as triton_scal
 
     HAS_TRITON = True
 except Exception:
-    triton_copy = None
+    triton_scal = None
     HAS_TRITON = False
 
 try:
-    from kernel_course.cute_ops import copy as cute_copy
+    from kernel_course.cute_ops import scal as cute_scal
 
     HAS_CUTE = True
 except Exception:
-    cute_copy = None
+    cute_scal = None
     HAS_CUTE = False
 
 
@@ -34,9 +34,9 @@ def factory(
     device: torch.device,
     dtype: torch.dtype = torch.float32,
 ):
-    x = torch.linspace(0.0, 1.0, steps=numel, device=device, dtype=dtype)
-    y = torch.empty_like(x)
-    return (x, y), {}
+    y = torch.linspace(0.0, 1.0, steps=numel, device=device, dtype=dtype)
+    alpha = 3.14
+    return (y, alpha), {}
 
 
 @pytest.mark.parametrize(
@@ -58,18 +58,18 @@ def factory(
 )
 @pytest.mark.parametrize(
     "dtype",
-    [torch.float32, torch.float16, torch.bfloat16, torch.int32, torch.bool],
+    [torch.float32, torch.float16, torch.bfloat16],
 )
 @pytest.mark.parametrize(
     "numel",
     [1 << 4, 1 << 8, 1 << 16],
 )
-def test_copy_benchmark(device: torch.device, dtype: torch.dtype, numel: int) -> None:
+def test_scal_benchmark(device: torch.device, dtype: torch.dtype, numel: int) -> None:
     impls = testing.get_impls(
-        python_impl=python_copy.copy,
-        pytorch_impl=pytorch_copy.copy if HAS_PYTORCH else None,
-        triton_impl=triton_copy.copy if HAS_TRITON else None,
-        cute_impl=cute_copy.copy if HAS_CUTE else None,
+        python_impl=python_scal.scal,
+        pytorch_impl=pytorch_scal.scal if HAS_PYTORCH else None,
+        triton_impl=triton_scal.scal if HAS_TRITON else None,
+        cute_impl=cute_scal.scal if HAS_CUTE else None,
     )
 
     # Benchmark each implementation
@@ -77,7 +77,7 @@ def test_copy_benchmark(device: torch.device, dtype: torch.dtype, numel: int) ->
     results = testing.run_benchmarks(
         impls,
         lambda: factory(numel, device, dtype),
-        flops=0.0,
+        flops=numel,
         config=config,
     )
 
