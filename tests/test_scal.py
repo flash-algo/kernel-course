@@ -77,7 +77,7 @@ def test_scal_benchmark(device: torch.device, dtype: torch.dtype, numel: int) ->
     results = testing.run_benchmarks(
         impls,
         lambda: factory(numel, device, dtype),
-        flops=2.0 * numel,
+        flops=numel,
         config=config,
     )
 
