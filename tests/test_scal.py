@@ -1,6 +1,5 @@
 import pytest
 import torch
-import random
 
 from kernel_course import testing
 from kernel_course.python_ops import scal as python_scal
