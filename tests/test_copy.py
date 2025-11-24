@@ -60,7 +60,11 @@ def factory(
     "dtype",
     [torch.float32, torch.float16, torch.bfloat16, torch.int32, torch.bool],
 )
-def test_copy_benchmark(device: torch.device, dtype: torch.dtype) -> None:
+@pytest.mark.parametrize(
+    "numel",
+    [1 << 4, 1 << 8, 1 << 16],
+)
+def test_copy_benchmark(device: torch.device, dtype: torch.dtype, numel: int) -> None:
     impls = testing.get_impls(
         python_impl=python_copy.copy,
         pytorch_impl=pytorch_copy.copy if HAS_PYTORCH else None,
@@ -68,7 +72,6 @@ def test_copy_benchmark(device: torch.device, dtype: torch.dtype) -> None:
         cute_impl=cute_copy.copy if HAS_CUTE else None,
     )
 
-    numel = 1 << 16
     # Benchmark each implementation
     config = testing.BenchmarkConfig(warmup=3, repeat=1_000)
     results = testing.run_benchmarks(
