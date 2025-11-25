@@ -4,10 +4,10 @@ The `axpby` operator computes a linear combination of two input tensors, scaling
 
 ## Mathematical Definition
 
-Given input tensors `x` and `y`, scalar coefficients `a` and `b`, the kernel evaluates
+Given input tensors `x` and `y`, scalar coefficients `\alpha` and `\beta`, the kernel evaluates
 
 $$
-y = a \times x + b \times y
+y = \alpha \times x + \beta \times y
 $$
 
 The operation is performed element by element, combining corresponding entries from `x` and `y` according to the specified scaling factors.
