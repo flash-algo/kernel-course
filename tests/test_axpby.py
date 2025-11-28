@@ -69,9 +69,9 @@ def factory(
 def test_axpby_benchmark(device: torch.device, dtype: torch.dtype, numel: int) -> None:
     impls = testing.get_impls(
         python_impl=python_axpby.axpby,
-        pytorch_impl=pytorch_axpby.axpby,
-        triton_impl=triton_axpby.axpby,
-        cute_impl=cute_axpby.axpby,
+        pytorch_impl=pytorch_axpby.axpby if HAS_PYTORCH else None,
+        triton_impl=triton_axpby.axpby if HAS_TRITON else None,
+        cute_impl=cute_axpby.axpby if HAS_CUTE else None,
     )
 
     # Benchmark each implementation
