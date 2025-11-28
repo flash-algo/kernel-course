@@ -2,30 +2,30 @@ import pytest
 import torch
 
 from kernel_course import testing
-from kernel_course.python_ops import swap as python_swap
+from kernel_course.python_ops import axpby as python_axpby
 
 try:
-    from kernel_course.pytorch_ops import swap as pytorch_swap
+    from kernel_course.pytorch_ops import axpby as pytorch_axpby
 
     HAS_PYTORCH = True
 except Exception:
-    pytorch_swap = None
+    pytorch_axpby = None
     HAS_PYTORCH = False
 
 try:
-    from kernel_course.triton_ops import swap as triton_swap
+    from kernel_course.triton_ops import axpby as triton_axpby
 
     HAS_TRITON = True
 except Exception:
-    triton_swap = None
+    triton_axpby = None
     HAS_TRITON = False
 
 try:
-    from kernel_course.cute_ops import swap as cute_swap
+    from kernel_course.cute_ops import axpby as cute_axpby
 
     HAS_CUTE = True
 except Exception:
-    cute_swap = None
+    cute_axpby = None
     HAS_CUTE = False
 
 
@@ -35,8 +35,10 @@ def factory(
     dtype: torch.dtype = torch.float32,
 ):
     x = torch.linspace(0.0, 1.0, steps=numel, device=device, dtype=dtype)
-    y = torch.linspace(1.0, 0.0, steps=numel, device=device, dtype=dtype)
-    return (x, y), {}
+    y = torch.linspace(0.0, 1.0, steps=numel, device=device, dtype=dtype)
+    alpha = 1.14
+    beta = 5.14
+    return (x, y, alpha, beta), {}
 
 
 @pytest.mark.parametrize(
@@ -64,12 +66,12 @@ def factory(
     "numel",
     [1 << 4, 1 << 8, 1 << 16],
 )
-def test_swap_benchmark(device: torch.device, dtype: torch.dtype, numel: int) -> None:
+def test_axpby_benchmark(device: torch.device, dtype: torch.dtype, numel: int) -> None:
     impls = testing.get_impls(
-        python_impl=python_swap.swap,
-        pytorch_impl=pytorch_swap.swap if HAS_PYTORCH else None,
-        triton_impl=triton_swap.swap if HAS_TRITON else None,
-        cute_impl=cute_swap.swap if HAS_CUTE else None,
+        python_impl=python_axpby.axpby,
+        pytorch_impl=pytorch_axpby.axpby if HAS_PYTORCH else None,
+        triton_impl=triton_axpby.axpby if HAS_TRITON else None,
+        cute_impl=cute_axpby.axpby if HAS_CUTE else None,
     )
 
     # Benchmark each implementation
@@ -77,7 +79,7 @@ def test_swap_benchmark(device: torch.device, dtype: torch.dtype, numel: int) ->
     results = testing.run_benchmarks(
         impls,
         lambda: factory(numel, device, dtype),
-        flops=0.0,
+        flops=3 * numel,
         config=config,
     )
 
