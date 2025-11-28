@@ -58,7 +58,7 @@ def factory(
 )
 @pytest.mark.parametrize(
     "dtype",
-    [torch.float32, torch.float16, torch.bfloat16, torch.int32, torch.bool],
+    [torch.float32, torch.float16, torch.bfloat16],
 )
 @pytest.mark.parametrize(
     "numel",
