@@ -19,8 +19,9 @@ def dot(
     x = x.reshape(-1)
     y = y.reshape(-1)
 
-    z = torch.tensor(0.0, device=x.device, dtype=x.dtype)
+    z = torch.tensor(0.0, device=x.device, dtype=torch.float32)
     for i in range(len(x)):
-        z += x[i] * y[i]
+        z += (x[i] * y[i]).to(torch.float32)
+    z = z.to(x.dtype)
 
     return z
