@@ -7,7 +7,7 @@ The `dot` operator computes the dot product of two vectors.
 Given two input vectors `x` and `y`, the kernel evaluates
 
 $$
-z = x^\top \cdot y
+z = x^\top y
 $$
 
 The dot product is computed by multiplying corresponding elements of `x` and `y`, and summing the results to produce a single scalar value `z`.
