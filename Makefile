@@ -2,7 +2,7 @@ PYTHON := python
 
 .PHONY: test style quality fixup modified_only_fixup
 
-check_dirs := kernel_course tests
+check_dirs := kernel_course tests docs
 
 test:
 	$(PYTHON) -m pytest tests
