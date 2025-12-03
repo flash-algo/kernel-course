@@ -18,6 +18,9 @@ def gemv(
         y (torch.Tensor): Vector tensor to be updated.
         alpha (float): Scaling factor for the product of `A` and `x`.
         beta (float): Scaling factor for `y`.
+    
+    Returns:
+        torch.Tensor: The updated tensor `y`.
     """
 
     y = alpha * A @ x + beta * y
