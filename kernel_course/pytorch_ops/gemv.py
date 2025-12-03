@@ -10,7 +10,7 @@ def gemv(
 ) -> torch.Tensor:
     """
     Updates tensor `y` by adding the product of matrix `A` and vector `x`
-    scaled by `alpha`, and `y` scaled by `beta`.
+    scaled by `alpha`, and `y` scaled by `beta` using PyTorch operations.
 
     Args:
         A (torch.Tensor): Matrix tensor.
@@ -23,6 +23,6 @@ def gemv(
         torch.Tensor: The updated tensor `y`.
     """
 
-    y = alpha * A @ x + beta * y
+    y = torch.add(torch.mul(torch.matmul(A, x), alpha), torch.mul(y, beta))
 
     return y
