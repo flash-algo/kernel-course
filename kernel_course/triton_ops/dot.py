@@ -5,8 +5,7 @@ import triton.language as tl
 
 @triton.autotune(
     configs=[
-        triton.Config({"BLOCK_SIZE": 1024}, num_stages=4, num_warps=4),
-        triton.Config({"BLOCK_SIZE": 2048}, num_stages=4, num_warps=8),
+        triton.Config({"BLOCK_SIZE": 1024}, num_stages=2, num_warps=4),
     ],
     key=["n_elements"],
 )
@@ -32,7 +31,7 @@ def dot_kernel(
     x = tl.load(x_ptr + offsets, mask=mask)
     y = tl.load(y_ptr + offsets, mask=mask)
     # Compute z = x \cdot y
-    z = tl.dot(tl.trans(x), y)
+    z = tl.sum(x * y)
     # Write z back to DRAM
     tl.store(z_ptr + offsets, z, mask=mask)
 
@@ -61,7 +60,6 @@ def dot(
     # The SPMD launch grid denotes the number of kernel instances that run it parallelly
     # It is analogous to CUDA launch grids. It can be either Tuple[int], or Callable(metaparameters) -> Tuple[int]
     # In this case, we use a 1D grid where the size is the number of blocks needed to cover all elements
-
     def grid(meta):
         return (triton.cdiv(n_elements, meta["BLOCK_SIZE"]),)
 

@@ -230,7 +230,9 @@ def run_benchmarks(
     results: List[BenchmarkResult] = []
     for impl in impl_list:
         args, kwargs = factory()
+        impl.synchronize()
         out = impl(*args, **kwargs)
+        impl.synchronize()
 
         if not torch.allclose(out, baseline_output, rtol=rtol, atol=atol):
             raise AssertionError(
