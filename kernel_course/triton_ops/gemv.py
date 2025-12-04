@@ -54,7 +54,9 @@ def gemv_kernel(
         mask_n = offs_n < n_elements_N
         # Load a block of A and x from DRAM, masking out any extra elements in case the input is not a multiple of the block size
         if EVEN_N & EVEN_M:
-            a = tl.load(A_ptr + offs_m[:, None] * stride_am + offs_n[None, :] * stride_an)
+            a = tl.load(
+                A_ptr + offs_m[:, None] * stride_am + offs_n[None, :] * stride_an
+            )
         else:
             a = tl.load(
                 A_ptr + offs_m[:, None] * stride_am + offs_n[None, :] * stride_an,
@@ -109,13 +111,20 @@ def gemv(
     # The SPMD launch grid is one-dimensional, with each program processing a block of rows of A
     def grid(meta):
         return (triton.cdiv(n_elements_M, meta["BLOCK_M"]),)
-    
+
     # Launch the Triton kernel
     gemv_kernel[grid](
-        A, x, y, alpha, beta,
-        A.stride(0), A.stride(1),
-        x.stride(0), y.stride(0),
-        n_elements_M, n_elements_N,
+        A,
+        x,
+        y,
+        alpha,
+        beta,
+        A.stride(0),
+        A.stride(1),
+        x.stride(0),
+        y.stride(0),
+        n_elements_M,
+        n_elements_N,
     )
 
     return y
