@@ -15,7 +15,7 @@ def geru(
         x (torch.Tensor): Vector tensor.
         y (torch.Tensor): Vector tensor.
         alpha (float): Scaling factor for the outer product of `x` and `y`.
-    
+
     Returns:
         torch.Tensor: The updated tensor `A`.
     """
