@@ -17,15 +17,15 @@ import triton.language as tl
 )
 @triton.jit
 def gemv_kernel(
-    A_ptr,
-    x_ptr,
-    y_ptr,
-    alpha,
-    beta,
+    A,
+    X,
+    Y,
     stride_am,
     stride_an,
     stride_x,
     stride_y,
+    alpha,
+    beta,
     n_elements_M,
     n_elements_N,
     BLOCK_M: tl.constexpr,
@@ -39,6 +39,10 @@ def gemv_kernel(
     # This program will process inputs that offset from the initial pointer
     offs_m = start_m * BLOCK_M + tl.arange(0, BLOCK_M)
     offs_n = tl.arange(0, BLOCK_N)
+    # Initialize pointers to the start of the blocks
+    A_ptr = A + offs_m[:, None] * stride_am
+    x_ptr = X
+    y_ptr = Y + offs_m * stride_y
     # Create a mask to guard memory operations against out-of-bounds accesses
     mask_m = offs_m < n_elements_M
     # Initialize the accumulator to zero for each row
@@ -55,11 +59,11 @@ def gemv_kernel(
         # Load a block of A and x from DRAM, masking out any extra elements in case the input is not a multiple of the block size
         if EVEN_N & EVEN_M:
             a = tl.load(
-                A_ptr + offs_m[:, None] * stride_am + offs_n[None, :] * stride_an
+                A_ptr + offs_n[None, :] * stride_an
             )
         else:
             a = tl.load(
-                A_ptr + offs_m[:, None] * stride_am + offs_n[None, :] * stride_an,
+                A_ptr + offs_n[None, :] * stride_an,
                 mask=mask_m[:, None] & mask_n[None, :],
                 other=0.0,
             )
@@ -71,16 +75,17 @@ def gemv_kernel(
         acc += tl.sum(a * x[None, :], axis=1)
     # Load y from DRAM, masking out any extra elements in case the input is not a multiple of the block size
     if EVEN_M:
-        y = tl.load(y_ptr + offs_m * stride_y)
+        y = tl.load(y_ptr)
     else:
-        y = tl.load(y_ptr + offs_m * stride_y, mask=mask_m, other=0.0)
+        y = tl.load(y_ptr, mask=mask_m, other=0.0)
     # Compute y = alpha * A * x + beta * y
-    y_new = (alpha * acc + beta * y).to(y.dtype)
+    y_new = beta * y
+    y_new += alpha * acc
     # Write y back to DRAM
     if EVEN_M:
-        tl.store(y_ptr + offs_m * stride_y, y_new)
+        tl.store(y_ptr, y_new)
     else:
-        tl.store(y_ptr + offs_m * stride_y, y_new, mask=mask_m)
+        tl.store(y_ptr, y_new, mask=mask_m)
 
 
 def gemv(
@@ -117,12 +122,12 @@ def gemv(
         A,
         x,
         y,
-        alpha,
-        beta,
         A.stride(0),
         A.stride(1),
         x.stride(0),
         y.stride(0),
+        alpha,
+        beta,
         n_elements_M,
         n_elements_N,
     )
