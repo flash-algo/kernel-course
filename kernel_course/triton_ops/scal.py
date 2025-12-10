@@ -11,7 +11,7 @@ import triton.language as tl
 )
 @triton.jit
 def scal_kernel(
-    y_ptr,
+    Y,
     alpha,
     n_elements,
     BLOCK_SIZE: tl.constexpr,
@@ -24,14 +24,16 @@ def scal_kernel(
     # We need note that offsets is a list of pointers
     block_start = pid * BLOCK_SIZE
     offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    # Initialize pointers to the start of the blocks
+    y_ptr = Y + offsets
     # Create a mask to guard memory operations against out-of-bounds accesses
     mask = offsets < n_elements
     # Load y from DRAM, masking out any extra elements in case the input is not a multiple of the block_size
-    y = tl.load(y_ptr + offsets, mask=mask)
+    y = tl.load(y_ptr, mask=mask)
     # Scale y by alpha
     y = y * alpha
     # Write y back to DRAM
-    tl.store(y_ptr + offsets, y, mask=mask)
+    tl.store(y_ptr, y, mask=mask)
 
 
 def scal(
