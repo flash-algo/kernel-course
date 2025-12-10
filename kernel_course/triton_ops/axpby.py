@@ -11,8 +11,8 @@ import triton.language as tl
 )
 @triton.jit
 def axpby_kernel(
-    x_ptr,
-    y_ptr,
+    X,
+    Y,
     alpha,
     beta,
     n_elements,
@@ -26,15 +26,19 @@ def axpby_kernel(
     # We need note that offsets is a list of pointers
     block_start = pid * BLOCK_SIZE
     offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    # Initialize pointers to the start of the blocks
+    x_ptr = X + offsets
+    y_ptr = Y + offsets
     # Create a mask to guard memory operations against out-of-bounds accesses
     mask = offsets < n_elements
     # Load x and y from DRAM, masking out any extra elements in case the input is not a multiple of the block_size
-    x = tl.load(x_ptr + offsets, mask=mask)
-    y = tl.load(y_ptr + offsets, mask=mask)
+    x = tl.load(x_ptr, mask=mask)
+    y = tl.load(y_ptr, mask=mask)
     # Compute y = alpha * x + beta * y
-    y = alpha * x + beta * y
+    y = beta * y
+    y += alpha * x
     # Write y back to DRAM
-    tl.store(y_ptr + offsets, y, mask=mask)
+    tl.store(y_ptr, y, mask=mask)
 
 
 def axpby(
