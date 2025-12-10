@@ -40,15 +40,9 @@ def geru_kernel(
     offs_m = start_m * BLOCK_M + tl.arange(0, BLOCK_M)
     offs_n = start_n * BLOCK_N + tl.arange(0, BLOCK_N)
     # Initialize pointers to the start of the blocks
-    A_ptr = (
-        A + offs_m[:, None] * stride_am + offs_n[None, :] * stride_an
-    )
-    x_ptr = (
-        X + offs_m * stride_x
-    )
-    y_ptr = (
-        Y + offs_n * stride_y
-    )
+    A_ptr = A + offs_m[:, None] * stride_am + offs_n[None, :] * stride_an
+    x_ptr = X + offs_m * stride_x
+    y_ptr = Y + offs_n * stride_y
     # Create a mask to guard memory operations against out-of-bounds accesses
     mask_m = offs_m < n_elements_M
     mask_n = offs_n < n_elements_N
@@ -109,7 +103,10 @@ def geru(
 
     # The SPMD launch grid is two-dimensional, with each program processing a block of A
     def grid(meta):
-        return (triton.cdiv(n_elements_M, meta["BLOCK_M"]), triton.cdiv(n_elements_N, meta["BLOCK_N"]))
+        return (
+            triton.cdiv(n_elements_M, meta["BLOCK_M"]),
+            triton.cdiv(n_elements_N, meta["BLOCK_N"]),
+        )
 
     # Launch the Triton kernel
     geru_kernel[grid](
