@@ -11,9 +11,9 @@ import triton.language as tl
 )
 @triton.jit
 def dot_kernel(
-    x_ptr,
-    y_ptr,
-    z_ptr,
+    X,
+    Y,
+    Z,
     n_elements,
     BLOCK_SIZE: tl.constexpr,
 ):
@@ -25,15 +25,19 @@ def dot_kernel(
     # We need note that offsets is a list of pointers
     block_start = pid * BLOCK_SIZE
     offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    # Initialize pointers to the start of the blocks
+    x_ptr = X + offsets
+    y_ptr = Y + offsets
+    z_ptr = Z + offsets
     # Create a mask to guard memory operations against out-of-bounds accesses
     mask = offsets < n_elements
     # Load x and y from DRAM, masking out any extra elements in case the input is not a multiple of the block_size
-    x = tl.load(x_ptr + offsets, mask=mask)
-    y = tl.load(y_ptr + offsets, mask=mask)
+    x = tl.load(x_ptr, mask=mask)
+    y = tl.load(y_ptr, mask=mask)
     # Compute z = x \cdot y
     z = tl.sum(x * y)
     # Write z back to DRAM
-    tl.store(z_ptr + offsets, z, mask=mask)
+    tl.store(z_ptr, z, mask=mask)
 
 
 def dot(
