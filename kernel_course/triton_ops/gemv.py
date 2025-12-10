@@ -58,9 +58,7 @@ def gemv_kernel(
         mask_n = offs_n < n_elements_N
         # Load a block of A and x from DRAM, masking out any extra elements in case the input is not a multiple of the block size
         if EVEN_N & EVEN_M:
-            a = tl.load(
-                A_ptr + offs_n[None, :] * stride_an
-            )
+            a = tl.load(A_ptr + offs_n[None, :] * stride_an)
         else:
             a = tl.load(
                 A_ptr + offs_n[None, :] * stride_an,
