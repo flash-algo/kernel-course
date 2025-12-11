@@ -20,6 +20,6 @@ def geru(
         torch.Tensor: The updated tensor `A`.
     """
 
-    A = A + alpha * x[:, None] * y[None, :]
+    A = A + alpha * (x[:, None] * y[None, :])
 
     return A

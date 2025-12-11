@@ -2,30 +2,30 @@ import pytest
 import torch
 
 from kernel_course import testing
-from kernel_course.python_ops import gemv as python_gemv
+from kernel_course.python_ops import geru as python_geru
 
 try:
-    from kernel_course.pytorch_ops import gemv as pytorch_gemv
+    from kernel_course.pytorch_ops import geru as pytorch_geru
 
     HAS_PYTORCH = True
 except Exception:
-    pytorch_gemv = None
+    pytorch_geru = None
     HAS_PYTORCH = False
 
 try:
-    from kernel_course.triton_ops import gemv as triton_gemv
+    from kernel_course.triton_ops import geru as triton_geru
 
     HAS_TRITON = True
 except Exception:
-    triton_gemv = None
+    triton_geru = None
     HAS_TRITON = False
 
 try:
-    from kernel_course.cute_ops import gemv as cute_gemv
+    from kernel_course.cute_ops import geru as cute_geru
 
     HAS_CUTE = True
 except Exception:
-    cute_gemv = None
+    cute_geru = None
     HAS_CUTE = False
 
 
@@ -38,9 +38,8 @@ def factory(
     A = torch.linspace(0.0, 1.0, steps=M * N, device=device, dtype=dtype).view(M, N)
     x = torch.linspace(0.0, 1.0, steps=N, device=device, dtype=dtype)
     y = torch.linspace(0.0, 1.0, steps=M, device=device, dtype=dtype)
-    alpha = 1.14
-    beta = 5.14
-    return (A, x, y, alpha, beta), {}
+    alpha = 3.14
+    return (A, x, y, alpha), {}
 
 
 @pytest.mark.parametrize(
@@ -65,30 +64,28 @@ def factory(
     [torch.float32, torch.float16, torch.bfloat16],
 )
 @pytest.mark.parametrize(
-    "MN",
+    "numel",
     [
         (1 << 4, 1 << 4),
         (1 << 8, 1 << 8),
     ],
 )
-def test_gemv_benchmark(
-    device: torch.device,
-    dtype: torch.dtype,
-    MN: tuple[int, int],
+def test_geru_benchmark(
+    device: torch.device, dtype: torch.dtype, numel: tuple[int, int]
 ) -> None:
     impls = testing.get_impls(
-        python_impl=python_gemv.gemv,
-        pytorch_impl=pytorch_gemv.gemv if HAS_PYTORCH else None,
-        triton_impl=triton_gemv.gemv if HAS_TRITON else None,
-        cute_impl=cute_gemv.gemv if HAS_CUTE else None,
+        python_impl=python_geru.geru,
+        pytorch_impl=pytorch_geru.geru if HAS_PYTORCH else None,
+        triton_impl=triton_geru.geru if HAS_TRITON else None,
+        cute_impl=cute_geru.geru if HAS_CUTE else None,
     )
 
     # Benchmark each implementation
-    config = testing.BenchmarkConfig(warmup=3, repeat=100)
+    config = testing.BenchmarkConfig(warmup=3, repeat=1_000)
     results = testing.run_benchmarks(
         impls,
-        lambda: factory(MN, device, dtype),
-        flops=2 * MN[0] * MN[1],
+        lambda: factory(numel, device, dtype),
+        flops=2 * numel[0] * numel[1],
         config=config,
     )
 
