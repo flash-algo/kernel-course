@@ -20,6 +20,6 @@ def geru(
         torch.Tensor: The updated tensor `A`.
     """
 
-    A += torch.mul(torch.ger(x, y), alpha)
+    A = torch.add(A, torch.mul(torch.outer(x, y), alpha))
 
     return A
