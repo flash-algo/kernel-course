@@ -71,7 +71,7 @@ def factory(
         (1 << 8, 1 << 8),
     ],
 )
-def test_gemv(
+def test_gemv_benchmark(
     device: torch.device,
     dtype: torch.dtype,
     MN: tuple[int, int],
